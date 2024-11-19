@@ -44,22 +44,15 @@ def send_request():
             response = requests.patch(f"{base_url}?name={name_chave}", json=updates)
         elif method == "OPTIONS":
             response = requests.options(base_url)
-            result_box.insert(tk.END, f"Status: {response.status_code}\n")
 
-            # Adicionando uma verificação para o conteúdo da resposta
-            result_box.insert(tk.END, f"Response Content: {response.text}\n")  # Exibe o conteúdo bruto da resposta
+            # Processando o cabeçalho 'Allow'
+            allow_header = response.headers.get('Allow')
+            if allow_header:
+                methods_supported = allow_header.split(', ')
+                result_box.insert(tk.END, f"Supported Methods: {', '.join(methods_supported)}\n")
+            else:
+                result_box.insert(tk.END, "No 'Allow' header in response.\n")
 
-            # Verifica se a resposta contém JSON
-            try:
-                response_json = response.json()  # Tenta decodificar como JSON
-                methods_supported = response_json.get('methods', [])
-                result_box.insert(tk.END, f"Methods Supported: {', '.join(methods_supported)}\n")
-                result_box.insert(tk.END, f"Description: {response_json.get('description', '')}\n")
-            except ValueError:  # Caso não seja JSON, trate de forma diferente
-                result_box.insert(tk.END, "Resposta não em formato JSON.\n")
-            return
-        else:
-            result_box.insert(tk.END, "Método não suportado.")
             return
 
         # Exibe o resultado no campo de texto para os outros métodos
