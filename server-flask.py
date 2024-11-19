@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 
 app = Flask(__name__)
 
@@ -87,14 +87,17 @@ def patch_record():
 
     return jsonify({'message': 'record updated', 'record': record})
 
+
 @app.route('/', methods=['OPTIONS'])
 def options():
-    methods_supported = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
-    response = jsonify({
-        'description': 'This API manages name-email relationships stored in data.txt.'
-    })
-    print(response)
-    response.headers['Content-Type'] = 'application/json'  # Garante que o tipo de conteúdo seja JSON
+    response = make_response()
+
+    # Adiciona os cabeçalhos necessários para CORS
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Max-Age'] = '3600'  # Cache da resposta OPTIONS (em segundos)
+
     return response
 
 
